@@ -7,33 +7,34 @@
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-  <div id="screen-select" class="screen active">
-    <h1>Tic Tac Toe</h1>
-    <button onclick="startLocal()">🧍 Local Multiplayer</button>
-    <button onclick="startOnline()">🌍 Online Multiplayer</button>
-  </div>
-
-  <div id="screen-local" class="screen hidden">
-    <h2>Local Multiplayer</h2>
-    <div id="status-local"></div>
-    <div class="board" id="board-local"></div>
-    <button onclick="goHome()">⬅ Back</button>
-  </div>
-
-  <div id="screen-online" class="screen hidden">
-    <h2>Online Multiplayer</h2>
-    <div id="online-ui">
-      <div>
-        <input type="text" id="roomCodeInput" placeholder="Enter Room Code" />
-        <button onclick="joinRoom()">Join</button>
-      </div>
-      <button onclick="createRoom()">Create Room</button>
+  <div class="wrapper">
+    <div id="screen-select" class="screen active">
+      <h1>Tic Tac Toe</h1>
+      <button onclick="startLocal()">🧍 Local Multiplayer</button>
+      <button onclick="startOnline()">🌍 Online Multiplayer</button>
     </div>
-    <div id="status-online"></div>
-    <div class="board" id="board-online"></div>
-    <button onclick="goHome()">⬅ Back</button>
-  </div>
 
-  <script src="js/main.js"></script>
+    <div id="screen-local" class="screen hidden">
+      <h2>Local Multiplayer</h2>
+      <div id="status-local"></div>
+      <div class="board" id="board-local"></div>
+      <button onclick="goHome()">⬅ Back</button>
+    </div>
+
+    <div id="screen-online" class="screen hidden">
+      <h2>Online Multiplayer</h2>
+      <div id="online-ui">
+        <div>
+          <input type="text" id="roomCodeInput" placeholder="Enter Room Code" />
+          <button onclick="joinRoom()">Join</button>
+        </div>
+        <button onclick="createRoom()">Create Room</button>
+      </div>
+      <div id="status-online"></div>
+      <div class="board" id="board-online"></div>
+      <button onclick="goHome()">⬅ Back</button>
+    </div>
+  </div>
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>
