@@ -1,16 +1,12 @@
 {
-  "name": "docker-web-app",
+  "name": "tic-tac-toe-online",
   "version": "1.0.0",
-  "main": "index.js",
-"scripts": {
-    "start": "node app.js"
-},
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "express": "^5.1.0"
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
   },
-  "devDependencies": {},
-  "description": ""
+  "dependencies": {
+    "express": "^4.21.2",
+    "ws": "^8.18.1"
+  }
 }
