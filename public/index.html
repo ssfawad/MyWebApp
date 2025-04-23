@@ -1,147 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Tic Tac Toe</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    :root {
-      --cell-size: 100px;
-      --primary: #0d9488;
-      --accent: #facc15;
-      --bg: #1f2937;
-      --text: #f9fafb;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: start;
-      min-height: 100vh;
-      margin: 0;
-      padding: 2rem;
-    }
-
-    h1 {
-      margin-bottom: 0.5rem;
-      font-size: 2.5rem;
-      color: var(--primary);
-    }
-
-    #status {
-      font-size: 1.2rem;
-      margin-bottom: 2rem;
-      color: var(--accent);
-    }
-
-    .board {
-      display: grid;
-      grid-template-columns: repeat(3, var(--cell-size));
-      grid-template-rows: repeat(3, var(--cell-size));
-      gap: 10px;
-    }
-
-    .cell {
-      width: var(--cell-size);
-      height: var(--cell-size);
-      background: #374151;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.5rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.2s ease;
-    }
-
-    .cell:hover {
-      background: #4b5563;
-    }
-
-    @media (max-width: 500px) {
-      :root {
-        --cell-size: 70px;
-      }
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-  <h1>Tic Tac Toe</h1>
-  <div id="status">Connecting...</div>
-  <div class="board" id="board"></div>
+  <div id="screen-select" class="screen active">
+    <h1>Tic Tac Toe</h1>
+    <button onclick="startLocal()">🧍 Local Multiplayer</button>
+    <button onclick="startOnline()">🌍 Online Multiplayer</button>
+  </div>
 
-  <script>
-    const board = document.getElementById('board');
-    const status = document.getElementById('status');
-    let player = null;
-    let currentTurn = 1;
-    let cells = Array(9).fill("");
+  <div id="screen-local" class="screen hidden">
+    <h2>Local Multiplayer</h2>
+    <div id="status-local"></div>
+    <div class="board" id="board-local"></div>
+    <button onclick="goHome()">⬅ Back</button>
+  </div>
 
-    const checkWin = () => {
-      const wins = [
-        [0,1,2], [3,4,5], [6,7,8],
-        [0,3,6], [1,4,7], [2,5,8],
-        [0,4,8], [2,4,6]
-      ];
-      for (const [a,b,c] of wins) {
-        if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) {
-          return cells[a];
-        }
-      }
-      return cells.every(c => c) ? 'draw' : null;
-    };
-
-    const renderStatus = () => {
-      const winner = checkWin();
-      if (winner === 'draw') {
-        status.innerText = "It's a draw!";
-      } else if (winner) {
-        status.innerText = `Player ${winner === 'X' ? 1 : 2} wins!`;
-      } else {
-        status.innerText = `Your symbol: ${player === 1 ? 'X' : 'O'} | ${currentTurn === player ? 'Your turn' : 'Waiting...'}`;
-      }
-    };
-
-    for (let i = 0; i < 9; i++) {
-      const cell = document.createElement('div');
-      cell.className = 'cell';
-      cell.dataset.index = i;
-      board.appendChild(cell);
-    }
-
-    const ws = new WebSocket(`wss://${location.host}`);
-    ws.onmessage = ({ data }) => {
-      const msg = JSON.parse(data);
-      if (msg.type === 'init') {
-        player = msg.player;
-        renderStatus();
-      }
-      if (msg.type === 'move') {
-        const { index, symbol } = msg;
-        cells[index] = symbol;
-        board.children[index].innerText = symbol;
-        currentTurn = 3 - currentTurn;
-        renderStatus();
-      }
-    };
-
-    board.onclick = e => {
-      const cell = e.target;
-      const index = cell.dataset.index;
-      if (!player || cells[index] || currentTurn !== player || checkWin()) return;
-
-      const symbol = player === 1 ? 'X' : 'O';
-      cell.innerText = symbol;
-      cells[index] = symbol;
-      ws.send(JSON.stringify({ type: 'move', index, symbol }));
-      currentTurn = 3 - currentTurn;
-      renderStatus();
-    };
-  </script>
-</body>
-</html>
+  <div id="screen-online" class="screen hidden">
