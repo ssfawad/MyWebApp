@@ -1,13 +1,15 @@
 let ws, playerSymbol, room, currentTurn;
 let opponentConnected = false;
 let useAI = false;
-const cells = Array(9).fill("");
+let cells = [];
 
 export function initOnline() {
   const board = document.getElementById("board-online");
   const status = document.getElementById("status-online");
   const input = document.getElementById("roomCodeInput");
   board.innerHTML = "";
+  cells = Array(9).fill("");
+  currentTurn = "X";
 
   function renderBoard() {
     board.innerHTML = "";
@@ -17,11 +19,18 @@ export function initOnline() {
       cell.innerText = val;
       cell.onclick = () => {
         if (!val && playerSymbol && currentTurn === playerSymbol) {
+          makeMove(i, playerSymbol);
           ws.send(JSON.stringify({ type: "move", room, index: i, symbol: playerSymbol }));
         }
       };
       board.appendChild(cell);
     });
+  }
+
+  function makeMove(index, symbol) {
+    cells[index] = symbol;
+    currentTurn = symbol === "X" ? "O" : "X";
+    renderBoard();
   }
 
   window.createRoom = () => {
@@ -47,40 +56,46 @@ export function initOnline() {
       const msg = JSON.parse(data);
       if (msg.type === "init") {
         playerSymbol = msg.symbol;
-        status.innerText = `Connected as ${playerSymbol} | Room: ${room}`;
         currentTurn = "X";
         renderBoard();
+        status.innerText = `Connected as ${playerSymbol} | Room: ${room}`;
+
         if (playerSymbol === "X") {
           setTimeout(() => {
             if (!opponentConnected) {
               useAI = true;
-              status.innerText += " | No opponent found, using AI";
+              status.innerText += " | No opponent found, playing vs AI";
             }
           }, 5000);
         }
       }
+
       if (msg.type === "move") {
-        cells[msg.index] = msg.symbol;
-        currentTurn = msg.symbol === "X" ? "O" : "X";
-        renderBoard();
+        if (cells[msg.index] === "") {
+          makeMove(msg.index, msg.symbol);
+        }
+
+        // AI auto-respond if solo player
         if (useAI && playerSymbol === "X" && currentTurn === "O") {
           setTimeout(() => {
             const empty = cells.map((c, i) => c ? null : i).filter(i => i !== null);
             const random = empty[Math.floor(Math.random() * empty.length)];
-            cells[random] = "O";
-            currentTurn = "X";
-            renderBoard();
-            ws.send(JSON.stringify({ type: "move", room, index: random, symbol: "O" }));
+            if (random !== undefined) {
+              makeMove(random, "O");
+              ws.send(JSON.stringify({ type: "move", room, index: random, symbol: "O" }));
+            }
           }, 1000);
         } else {
           opponentConnected = true;
         }
       }
+
       if (msg.type === "restart") {
         cells.fill("");
         currentTurn = "X";
         renderBoard();
       }
+
       if (msg.type === "full") {
         status.innerText = "Room is full.";
         ws.close();
