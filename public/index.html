@@ -21,3 +21,19 @@
   </div>
 
   <div id="screen-online" class="screen hidden">
+    <h2>Online Multiplayer</h2>
+    <div id="online-ui">
+      <div>
+        <input type="text" id="roomCodeInput" placeholder="Enter Room Code" />
+        <button onclick="joinRoom()">Join</button>
+      </div>
+      <button onclick="createRoom()">Create Room</button>
+    </div>
+    <div id="status-online"></div>
+    <div class="board" id="board-online"></div>
+    <button onclick="goHome()">⬅ Back</button>
+  </div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
