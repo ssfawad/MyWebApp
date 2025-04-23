@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-const rooms = new Map(); // Map<roomCode, [ws1, ws2]>
+const rooms = new Map();
 
 wss.on("connection", ws => {
   let roomCode, playerIndex;
@@ -17,9 +17,7 @@ wss.on("connection", ws => {
 
     if (data.type === "join") {
       roomCode = data.room;
-      if (!rooms.has(roomCode)) {
-        rooms.set(roomCode, []);
-      }
+      if (!rooms.has(roomCode)) rooms.set(roomCode, []);
 
       const players = rooms.get(roomCode);
       if (players.length >= 2) {
@@ -30,14 +28,25 @@ wss.on("connection", ws => {
 
       playerIndex = players.length;
       players.push(ws);
+      const symbol = playerIndex === 0 ? "X" : "O";
 
-      ws.send(JSON.stringify({ type: "init", symbol: playerIndex === 0 ? "X" : "O" }));
+      ws.send(JSON.stringify({ type: "init", symbol }));
+    }
 
-    } else if (data.type === "move" && roomCode) {
+    if (data.type === "move" && roomCode) {
       const players = rooms.get(roomCode) || [];
       players.forEach(p => {
         if (p.readyState === WebSocket.OPEN) {
           p.send(JSON.stringify({ type: "move", index: data.index, symbol: data.symbol }));
+        }
+      });
+    }
+
+    if (data.type === "restart" && roomCode) {
+      const players = rooms.get(roomCode) || [];
+      players.forEach(p => {
+        if (p.readyState === WebSocket.OPEN) {
+          p.send(JSON.stringify({ type: "restart" }));
         }
       });
     }

@@ -1,12 +1,13 @@
-let ws, playerSymbol, room;
+let ws, playerSymbol, room, currentTurn;
+let opponentConnected = false;
+let useAI = false;
+const cells = Array(9).fill("");
 
 export function initOnline() {
   const board = document.getElementById("board-online");
   const status = document.getElementById("status-online");
   const input = document.getElementById("roomCodeInput");
   board.innerHTML = "";
-
-  const cells = Array(9).fill("");
 
   function renderBoard() {
     board.innerHTML = "";
@@ -15,7 +16,7 @@ export function initOnline() {
       cell.className = "cell";
       cell.innerText = val;
       cell.onclick = () => {
-        if (!val && playerSymbol && ws) {
+        if (!val && playerSymbol && currentTurn === playerSymbol) {
           ws.send(JSON.stringify({ type: "move", room, index: i, symbol: playerSymbol }));
         }
       };
@@ -47,9 +48,37 @@ export function initOnline() {
       if (msg.type === "init") {
         playerSymbol = msg.symbol;
         status.innerText = `Connected as ${playerSymbol} | Room: ${room}`;
+        currentTurn = "X";
+        renderBoard();
+        if (playerSymbol === "X") {
+          setTimeout(() => {
+            if (!opponentConnected) {
+              useAI = true;
+              status.innerText += " | No opponent found, using AI";
+            }
+          }, 5000);
+        }
       }
       if (msg.type === "move") {
         cells[msg.index] = msg.symbol;
+        currentTurn = msg.symbol === "X" ? "O" : "X";
+        renderBoard();
+        if (useAI && playerSymbol === "X" && currentTurn === "O") {
+          setTimeout(() => {
+            const empty = cells.map((c, i) => c ? null : i).filter(i => i !== null);
+            const random = empty[Math.floor(Math.random() * empty.length)];
+            cells[random] = "O";
+            currentTurn = "X";
+            renderBoard();
+            ws.send(JSON.stringify({ type: "move", room, index: random, symbol: "O" }));
+          }, 1000);
+        } else {
+          opponentConnected = true;
+        }
+      }
+      if (msg.type === "restart") {
+        cells.fill("");
+        currentTurn = "X";
         renderBoard();
       }
       if (msg.type === "full") {
@@ -60,4 +89,10 @@ export function initOnline() {
   }
 
   renderBoard();
+}
+
+export function restartOnline() {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: "restart", room }));
+  }
 }
