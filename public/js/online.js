@@ -2,8 +2,13 @@ let ws, playerSymbol, room, currentTurn;
 let opponentConnected = false;
 let useAI = false;
 let cells = [];
+let playMove = () => {};
+let playWin = () => {};
 
-export function initOnline() {
+export function initOnline(moveFn = () => {}, winFn = () => {}) {
+  playMove = moveFn;
+  playWin = winFn;
+
   const board = document.getElementById("board-online");
   const status = document.getElementById("status-online");
   const input = document.getElementById("roomCodeInput");
@@ -30,7 +35,24 @@ export function initOnline() {
   function makeMove(index, symbol) {
     cells[index] = symbol;
     currentTurn = symbol === "X" ? "O" : "X";
+    playMove();
     renderBoard();
+    checkWin();
+  }
+
+  function checkWin() {
+    const wins = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8],
+      [0, 3, 6], [1, 4, 7], [2, 5, 8],
+      [0, 4, 8], [2, 4, 6],
+    ];
+    for (const [a, b, c] of wins) {
+      if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) {
+        playWin();
+        return cells[a];
+      }
+    }
+    return null;
   }
 
   window.createRoom = () => {
@@ -59,7 +81,6 @@ export function initOnline() {
         currentTurn = "X";
         renderBoard();
         status.innerText = `Connected as ${playerSymbol} | Room: ${room}`;
-
         if (playerSymbol === "X") {
           setTimeout(() => {
             if (!opponentConnected) {
@@ -69,13 +90,11 @@ export function initOnline() {
           }, 5000);
         }
       }
-
       if (msg.type === "move") {
         if (cells[msg.index] === "") {
           makeMove(msg.index, msg.symbol);
         }
 
-        // AI auto-respond if solo player
         if (useAI && playerSymbol === "X" && currentTurn === "O") {
           setTimeout(() => {
             const empty = cells.map((c, i) => c ? null : i).filter(i => i !== null);
@@ -89,13 +108,11 @@ export function initOnline() {
           opponentConnected = true;
         }
       }
-
       if (msg.type === "restart") {
         cells.fill("");
         currentTurn = "X";
         renderBoard();
       }
-
       if (msg.type === "full") {
         status.innerText = "Room is full.";
         ws.close();

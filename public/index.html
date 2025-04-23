@@ -5,13 +5,20 @@
   <title>Tic Tac Toe</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="css/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
+  <audio id="move-sfx" src="data:audio/mp3;base64,//uQxAAAAAADAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA..." preload="auto"></audio>
+  <audio id="win-sfx" src="data:audio/mp3;base64,//uQxAAAAAADAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA..." preload="auto"></audio>
+  <audio id="restart-sfx" src="data:audio/mp3;base64,//uQxAAAAAADAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAACcQCA..." preload="auto"></audio>
+  
+
   <div class="wrapper">
     <div id="screen-select" class="screen active">
       <h1>Tic Tac Toe</h1>
       <button onclick="startLocal()">🧍 Local Multiplayer</button>
       <button onclick="startOnline()">🌍 Online Multiplayer</button>
+      <button onclick="startAI()">🤖 Play vs AI</button>
     </div>
 
     <div id="screen-local" class="screen hidden">
@@ -34,6 +41,14 @@
       <div id="status-online"></div>
       <div class="board" id="board-online"></div>
       <button onclick="restartOnline()">🔁 Restart</button>
+      <button onclick="goHome()">⬅ Back</button>
+    </div>
+
+    <div id="screen-ai" class="screen hidden">
+      <h2>Play vs AI</h2>
+      <div id="status-ai"></div>
+      <div class="board" id="board-ai"></div>
+      <button onclick="restartAI()">🔁 Restart</button>
       <button onclick="goHome()">⬅ Back</button>
     </div>
   </div>

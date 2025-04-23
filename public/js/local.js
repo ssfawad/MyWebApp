@@ -1,10 +1,9 @@
 let cells = [];
 
-export function initLocal() {
+export function initLocal(playMove = () => {}, playWin = () => {}) {
   const board = document.getElementById("board-local");
   const status = document.getElementById("status-local");
   board.innerHTML = "";
-
   cells = Array(9).fill("");
   let current = "X";
 
@@ -28,6 +27,7 @@ export function initLocal() {
       status.innerText = "It's a draw!";
     } else if (winner) {
       status.innerText = `Player ${winner} wins!`;
+      playWin();
     } else {
       status.innerText = `Current Turn: ${current}`;
     }
@@ -41,6 +41,7 @@ export function initLocal() {
       if (!cells[i] && !checkWin()) {
         cells[i] = current;
         cell.innerText = current;
+        playMove();
         current = current === "X" ? "O" : "X";
         renderStatus();
       }
@@ -52,5 +53,5 @@ export function initLocal() {
 }
 
 export function restartLocal() {
-  initLocal(); // Simply re-initialize the local game
+  initLocal();
 }
