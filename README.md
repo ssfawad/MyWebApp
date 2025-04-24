@@ -2,6 +2,12 @@
 
 A real-time two-player Tic-Tac-Toe game built with Node.js and WebSockets, containerized using Docker, and deployed to Azure Web Apps using GitHub Actions.
 
+  <p>
+    <span style="font-size: 1.2em; font-weight: bold;">🔗 Live Demo:</span>
+    <a href="https://syed-docker-webapp-gvfzd2b9cugagyd9.canadacentral-01.azurewebsites.net/" target="_blank">
+      Syed Fawad Tic-Tac-Toe
+    </a>
+  </p>
 ---
 
 ## 📦 Tech Stack
